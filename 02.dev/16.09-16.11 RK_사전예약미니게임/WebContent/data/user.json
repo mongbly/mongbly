@@ -1,0 +1,13 @@
+{
+	"userName" : "비와잉",
+	"userImage" : "http://imgnews.naver.com/image/366/2015/10/17/2015101701226_0_99_20151017154603.jpg",
+	"guild" : {
+		"guildName" : "싸이먼도미니크레이",
+		"guildId" : 9999,
+		"monsterSum" : 100,
+		"rank" : 12
+	},
+	"dagger" : 100,
+	"ticket" : 5,
+	"monster" : 3
+}

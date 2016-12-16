@@ -1,0 +1,53 @@
+{
+	"collectionRanking" : [{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "에반게리온",
+		"monsterSum" : 1
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "영원히비와",
+		"monsterSum" : 12
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "10억짜리 열매",
+		"monsterSum" : 123
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "4위면도미닉",
+		"monsterSum" : 1234
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "점점늘어나는팔로",
+		"monsterSum" : 12345
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "엔씨소프트",
+		"monsterSum" : 123456
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "GOODMUSIC",
+		"monsterSum" : 1234567
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "카카오스토리",
+		"monsterSum" : 234567
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "백두산",
+		"monsterSum" : 34567
+	},{
+		"rank" : 1,
+		"guildId": 0,
+		"guildName" : "시크릿어벤져스",
+		"monsterSum" : 4567
+	}]
+}

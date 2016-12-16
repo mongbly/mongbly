@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>Lineage Red Knight</title>
+<link rel="stylesheet" type="text/css" href="../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../css/race.css" />
+<script src="../js/lang_kor.js"></script>
+<script src="../js/ncjs.js"></script>
+<!--<script src="../js/common.js"></script>-->
+<script>
+// check resize ==========================================================================================
+var MAX_WIDTH = 480;
+(function($){
+	var __wrapper;
+
+	function _checkSize(){
+		var ref = window.innerWidth;
+		ref = ref < MAX_WIDTH ? ref : MAX_WIDTH;
+
+		__wrapper.width(ref);
+		document.body.style.fontSize = (ref/10) + 'px';
+	}
+
+	$.$init(function(){
+		__wrapper = $.$sprite.ADD($.$find('.wrapper'));
+		stage.addEvent('resize', _checkSize).trigger('resize');
+	});
+})(ncjs);
+</script>
+<script src="../js/running.js"></script>
+<script>
+// REPLAY RUNNING ACCTION
+(function($){
+	var $TXT = RK_RESOURCES;
+	var RESOURCES = $TXT.img;
+	var ISFIRST = true;
+	
+	var _bw , _container , _block;
+	var _running , _roll , _flowId = 0;
+	var _countId , _isCounting , _countCover , _countImg , _players = [] , _seqs = [];
+	
+	var WINNER = 0;
+	var GRADE_IDS = [1,2,3,4,5];
+	var RUNNERS = [5,9,11,3,18];
+	var SEQ_LEN = [9,11,13,10,11,11,11,10,12,11,11,10,9,8,12,10,11,15,8,12,9,7,11,11,10,12,9,9,10,10]
+	var SEQ = [];
+
+	function _initialize(){
+		stage._sound = function(){};
+		_run();
+		_setSeqData();
+		_setPlayers();
+		$.$sprite.ADD($.$find(".countdown")).visible(false);
+
+		if(ISFIRST) return;
+		_setCountDown('reset');
+	}
+	
+	function _setSeqData(){
+		var j = 0;
+		
+		$.$each(RUNNERS , function($id){
+			SEQ[j] = [];
+			var len = $.$option().level == 3? SEQ_LEN[$id] : $.$option().level == 2 ? SEQ_LEN[$id]/2 : 3;
+			for(var i = k = 0 ; i < len ; i++){
+				k = i<10 ? "0"+i : i;
+				SEQ[j].push(RESOURCES +"race/monster/"+$id+"/"+k+".png");
+			}
+			j++;
+		});
+		
+	}
+	
+	function _run(){
+		_container = $.$sprite.ADD($.$find(".raceView"));
+		$.$sprite.ADD($.$find(".btn_replay")).mouseClick(_setCountDown);
+	}
+	
+	function _setCountDown($type){
+		ISFIRST = false;
+		_countId = 3;
+		_block = false;
+		
+		if(!_countCover){
+			_countCover =  $.$sprite.ADD($.$find(".countdown")).visible(true).style({"left": 0 , "top":0});
+			_countImg = $.$sprite.ADD($.$find(".countdown img")).style("position","absolute");
+			stage.enterframe(_sizeCheck);
+		}
+		
+		if(_running){
+			_flowId = 0;
+			 _running.reset();
+			 _playerReadyClose();
+			 $.$each(_seqs , function($seq){
+				$seq.stop(1); 
+			 });
+		}
+		
+		_isCounting = true;
+		_countImg.visible(false).scaleX(1).scaleY(1);
+
+		if($type == 'reset'){
+			_countImg.attr('src', RESOURCES +"race/countdown_3.png");
+			return;
+		}
+
+		_countImg.timerR(counting).timer(1000,3,counting).attr('src', RESOURCES +"race/countdown_3.png");
+		_playerReady(stage);
+		_setCountPos();
+		
+		function counting(){
+			var oriW = _countCover.width() , oriH = _countImg.height();
+			if(_countId>0){
+				_setCountShow(RESOURCES +"race/countdown_"+_countId+".png");
+				_countId--;
+			}else{
+				_isCounting = false;
+				_countImg.visible(false);
+				_playerReadyClose();
+				_setTrackInit();
+			}
+		}
+
+		stage._sound('countdown');
+		counting();
+	} 
+	
+	function _playerReady($target){
+		$target.timerR(_playerMoving).timer(200 + (_countId*100), 1 , _playerMoving , $target);
+	}
+	
+	function _playerMoving(){
+		var id = Math.floor(Math.random()*_players.length);
+		var target = _players[id];
+		var tx = target.x();
+		
+		if(target == this){
+			console.log("SAME");
+			_playerReady(this);
+		}
+		else if(target.asset("moving")){
+			_playerReady(target);
+		}else{
+			target.asset("moving" , true);
+			$.$tweener.TO(target , .1 , {x : tx+10 , onComplete : function(){
+				$.$tweener.TO(target , .1 , {x : tx , onComplete :function(){
+					target.asset("moving" , false);
+					_playerReady(stage);
+				}});
+			}});
+		}
+	}
+	
+	function _playerReadyClose(){
+		 stage.timerR(_playerMoving);
+		 $.$each(_players, function($item){
+			$item.timerR(_playerMoving);
+			$.$tweener.KILL($item); 
+		 });
+	}
+	
+	function _setPlayers(){
+		if(_players.length > 0) return;
+
+		var i = 0;
+		var mv = 0;
+		var level = $.$option().level;
+		
+		$.$each($.$find(_container,'.player'),function($item){
+			$item = $.$sprite.ADD($item);
+			$item.style({"width" : (45-mv) + "%"});
+			$item.x((_container.width()*.1) - (($item.width()/2)-mv));
+
+			var seq = $.$sequence.FACTORY($.$sequence.ARG.urls(SEQ[i++]).img($.$sprite.ADD($.$find($item , "img"))).speed(level == 3 ? .6 : level == 2 ? Math.random()*1+1: Math.random()*3+3));
+			_players.push($item);
+			_seqs.push(seq);
+			seq.stop(1);
+			mv+=3;
+		});
+	}
+	
+	function _playersRunning(){
+		_running.start(WINNER , GRADE_IDS);
+		 $.$each(_seqs , function($seq){
+				$seq.play(true);
+		 });
+	}
+	
+	function _setCountPos(){
+//		if(!_isCounting) return;
+		_countCover.x((_container.width()/2) - (_countImg.width()/2)).y((_container.height()/2) - (_countImg.height()/2));
+	}
+	
+	
+	function _setTrackInit(){
+		if(_running){
+			_playersRunning();
+		}else{
+			_setTrack();
+		}
+	}
+	
+	function _setTrack(){
+		var isEnd;
+		var speed = 0;
+		var track = $.$sprite.ADD($.$find(".track")).attr("innerHTML" , " ");
+		var data = $.$provider.FACTORY($.$provider.ARG.map([RESOURCES +"race/run_0.jpg",RESOURCES +"race/run_1.jpg",RESOURCES +"race/run_2.jpg",RESOURCES +"race/run_3.jpg"]).loop());
+		var isComplete = false;
+		
+		_bw = _container.width();
+		_roll = $.$rolllist.FACTORY($.$rolllist.ARG.target(track).size(track.width()).item(function($index) {
+    		var item =  $.$sprite.ADD('div').attr({className : 'item', innerHTML : '<img src="'+ RESOURCES +'race/run_0.jpg"/>'}).style({position:'absolute'});
+            return item;
+		}).turm(function($id) { 
+          return _container.width()-2;
+        }).dataReset(function($item, $data) {
+        	if(_block) return;
+        	$item.attr({innerHTML : '<img src="'+(_flowId == 0 ? data.getData(0) : data.getData(1) )+'"/>'});
+        	$.$sprite.ADD($.$find($item , "img")).width(_container.width());
+        	_flowId ++;
+        }).onComplete(function(){
+        	
+        }));
+		
+		_roll.data(data);
+		_setRunning(_roll); 
+		_playersRunning();
+	}
+	
+	function _setRunning($track){
+		var flowEnd;
+		
+		_running = $.$running.FACTORY($.$running.ARG.players(_players).time(3).rollList($track).size(_container.width()) 
+				.onComplete(function(){
+					$.$each(_seqs , function($seq){
+		    			$seq.stop();
+		    		});
+				})
+				.onFinal(function($a , $b){
+					_block = true;
+					$a.attr("innerHTML" ,'<img src="'+ RESOURCES +'race/run_2.jpg"/>');
+					$b.attr("innerHTML" ,'<img src="'+ RESOURCES +'race/run_3.jpg"/>');
+				}).onDelay(function($value){
+					$.$each(_seqs , function($seq){
+						$seq.setRatio($value);
+		    			$seq.play(true); 
+		    		});
+				})
+				.onTime(function($time){
+				})
+				.onBlock(function(){
+					_setCountShow(RESOURCES +"race/final.png");
+		    		$.$each(_seqs , function($seq){
+		    			$seq.stop();
+		    		});
+		    		stage.timer(1000,1,function(){
+		    			$.$each(_seqs , function($seq){
+		    				$seq.play(true);
+		    			});
+		    			_running.resume();
+		    			_countImg.visible(false);
+		    		});
+					setTimeout(function(){
+						stage.trigger('RK_RAC_REPLAY_FINISH');
+					}, 1000);
+				})); 
+		
+		_running.start(WINNER , GRADE_IDS);
+	}
+	
+	function _setCountShow($url){
+		var sx = $url.indexOf("final") > -1 ? 1.4728 : 1;
+		var oriW = _countCover.width() , oriH = _countImg.height();
+		var imgW =  _countImg.width() * sx;
+		_countImg.attr("src" , $url).visible(true).width(imgW);
+		_setCountPos();
+		
+		_countImg.scaleX(3*sx).scaleY(3);
+		_countImg.x(-(_countImg.width()-oriW)/2).y( - (_countImg.height()-oriH)/2);
+		$.$tweener.TO(_countImg,.3,{x:0,y:0,scaleX:sx ,scaleY:1,ease:$.$tweener.EASE.backIO});  
+	}
+	
+	function _sizeCheck(){
+		if(_bw!=_container.width()){
+			_bw = _container.width();
+			_setCountPos();
+			if(_running!=null) _running.resize(_bw);
+		}
+	}
+	
+	$.$init(_initialize);
+	/**
+	stage.addEvent('RK_RAC_VIEW_REPLAY', function($w,$data){
+		var slot = [], rankingArray = [];
+
+		// 소환수 랭킹 순서대로 배열 정리 
+		$.$each($data.raceResult, function($item){
+			if($item.rank){
+				rankingArray[$item.rank-1] = $item;
+			}else{
+				rankingArray.push($item);
+			}
+		});
+		
+		for(var i=0; i<5; i++){
+			var pos = getRandom(5, i==0);
+			GRADE_IDS[pos] = i+1;
+			RUNNERS[pos] = rankingArray[i].monsterId-1;
+		}
+
+		_initialize();
+
+		function getRandom($max,$reset){
+			if($reset) slot = [];
+			var output = parseInt(Math.random()*$max), diff = true;
+			if(slot[output]) diff = false;
+			else slot[output] = true;
+			return diff ? output : getRandom($max, false);
+		}
+	});
+	stage.addEvent('RK_RAC_RUNNING', _setCountDown);
+
+	$.$init(function(){
+		// preload image
+		var urls = [RESOURCES +"race/run_0.jpg",RESOURCES +"race/run_1.jpg",RESOURCES +"race/run_2.jpg",RESOURCES +"race/run_3.jpg"];
+		stage.PRELOAD = [];
+		$.$each(urls, function($item){
+			var img = document.createElement('img');
+			img.setAttribute('src', $item);
+			stage.PRELOAD.push(img);
+		});
+	});
+	**/
+})(ncjs);
+</script>
+</head>
+<body>
+
+<div class="wrapper">
+	<!-- header -->
+	<div class="header"><div class="profileImg"><img class="image" src="http://dn.sfile.plaync.com/data/87458A38-FE19-4132-B2F8-43CB3FAB0721/profile"><img class="cover" src="../img/common/header_profile_bg.png"></div><div class="profile"><div class="server">Deporojyu</div><div class="guild">test8</div><div class="name">infradev01</div></div><div class="info dagger"><span class="number">359</span><img src="../img/_lang/ko/common/header_info_dagger.png"></div><div class="info summons"><span class="number">18</span><img src="../img/_lang/ko/common/header_info_summons.png">			</div><button class="btn_guide"><img src="../img/common/header_btn_guide.png"></button></div>
+
+	<!-- container -->
+	<div class="container">
+
+		<div class="infoArea">
+			<div class="timeArea">
+				<div class="txt game">10경기</div>
+				<div class="txt time">2016.09.09-01:00:00</div>
+				<div class="txt guild">1,247</div>
+				<div class="txt all">28,444</div>
+				<img src="../img/_lang/ko/race/info_timeArea_replay.png" />
+			</div>
+			<div class="gameTitle">
+				<span class="text"><span class="game">10경기</span> 레이스 결과입니다</span>
+				<img src="../img/race/info_title_bg.png" />
+			</div>
+		</div>
+
+		<div class="raceArea">
+			<img class="bg_bar" src="../img/common/bar_bg_bottom.png" />
+			<div class="raceView">
+				<div class="players">
+					<div class="player line1" style="left:10%;"><img src="../img/race/monster/0/00.png" /></div>
+					<div class="player line2" style="left:10%;"><img src="../img/race/monster/1/00.png" /></div>
+					<div class="player line3" style="left:10%;"><img src="../img/race/monster/2/00.png" /></div>
+					<div class="player line4" style="left:10%;"><img src="../img/race/monster/3/00.png" /></div>
+					<div class="player line5" style="left:10%;"><img src="../img/race/monster/4/00.png" /></div>
+				</div>
+				<div class="track">
+					<div class="item" style="left:0%;"><img src="../img/race/run_0.jpg" /></div>
+					<div class="item" style="left:100%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:170%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:240%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:310%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:380%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:450%;"><img src="../img/race/run_2.jpg" /></div>
+				</div>
+				<div class="countdown"><img src="../img/race/countdown_3.png" /></div>
+			</div>
+			
+			<button class="button btn_goto_waiting"><img src="../img/_lang/ko/race/btn_goto_waiting.png" /></button>
+			<button class="button btn_replay"><img src="../img/_lang/ko/race/btn_replay.png" /></button>
+		</div>
+
+		<!-- status -->
+		<div class="statusArea">
+			<img class="bg_bar" src="../img/common/bar_bg_top.png" />
+			<img class="bg" src="../img/_lang/ko/race/status_replay.png" />
+			<img class="icon" src="../img/_lang/ko/race/icon_fail.png" />
+			<div class="text monster_name">다크엘프 스카우터</div>
+			<div class="text dagger">20</div>
+			<div class="text point">306</div>
+			<div class="text rank">2</div>
+		</div>
+
+	</div>
+
+	<!-- bottom -->
+	<div class="bottom"><button><img src="../img/_lang/ko/common/bottom_rank.png"></button><button><img src="../img/_lang/ko/common/bottom_game1.png"></button><button><img src="../img/_lang/ko/common/bottom_game2.png"></button></div>
+
+</div>
+
+</body>
+</html>

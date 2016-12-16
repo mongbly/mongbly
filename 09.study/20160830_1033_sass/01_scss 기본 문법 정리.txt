@@ -1,0 +1,273 @@
+/************************* 
+
+	 SASS 
+Reference ; https://speakerdeck.com/imathis/sass-compass-the-future-of-stylesheets-now
+
+**************************/
+
+
+/* --------------- */
+/* SASS - Selector */
+/* --------------- */
+
+01 /
+article {}
+article header {}
+	↓
+article {
+	header {}
+}
+
+
+02 / 
+article header, article section {}
+	↓
+article {
+	header, section {}
+}
+
+
+03 /
+article > h2 {}
+article ~ article {}
+article + footer {}
+article * {}
+	↓
+article {
+	>h2 {}
+	~article {}
+	+ footer {}
+	* {}
+} 
+
+
+04 / 
+a {}
+a:hover {}
+	↓
+a {
+	&:hover {}
+}
+
+
+05 / 
+.blog-index article h1 {}
+	↓
+article {
+	.blog-index & {
+		h1 {}
+	}
+}
+
+
+06 / 
+#content {}
+@media (min-width:1280px) {}
+	↓
+#content {
+	@media (min-width:1280px) {}	
+}
+
+
+/* --------------- */
+
+
+01 / Variable
+a {color:blue}
+a:hover {color:#fff}
+	↓
+$link-color : blue;
+$link-hover : #fff;
+a {
+	color:$link-color;
+	&:hover {color:$link-hover}
+}
+
+
+02 / @extend
+<div class="button button-extend"></div>
+.button {background:gray;border:1px solid black;}
+.button-extend {padding:10px}
+.button, .button-extend {color:pink}
+	↓
+.button {background:gray;border:1px solid black;}
+.button-extend {
+	@extend .button;
+	padding:10px
+}
+
+
+03 / @mixins
+nav a {text-decoration:none;}
+nav a:hover {text-decoration:underline;}
+	↓
+@mixin hover-link {
+	text-decoration:none;
+	&:hover {text-decoration:underline;}
+}
+nav a {@include hover-link;}
+
+.button {border-radius:5px}
+	↓
+@mixin border-radius($amount){
+	border-radius:$amount;
+}
+.button {@include border-radius(5px);}
+
+.box {background:aqua;color:#fff}
+.box:hover {background:#fff;color:aqua;}
+	↓
+@mixin color-set($bg:aqua, $txt:blue){
+	background:$bg;
+	color:$txt;
+	&:hover {
+		background:$txt;
+		color:$bg;
+	}
+}
+.box {@include color-set($txt:#fff)}
+
+
+04 / @import
+
+
+05 / math
+1em + 1px;
+1em - 1px;
+1em * 1px;
+1em % 1px; // 나머지 구하기
+1em / 1px;
+percentage(13/25)
+round(2.4)
+ceil(2.2)
+floor(2.6)
+abs(-24)
+
+
+06 / conditionals
+1 < 20
+1 <= 20
+1 > 20
+1 >= 20
+1+1 != 2
+1+1 == 2
+red == #f00
+red == #ff0000
+red == rgb(255,0,0)
+red == rgba(255,0,0,0)
+red == hsl (0deg, 100% 100%)
+red == hsla(0deg, 100% 100%, 1)
+	
+	06_1 / if
+	$theme:a;
+	div{
+		@if $theme == a{
+			background:red
+		}@else if $theme == b{
+			background:orange
+		}@else {
+			background:yellow
+		}
+	}
+
+	$main-bg:#000;
+	.main {color:if($main-bg == black, #fff, #000);}
+
+
+	06_2 / @for
+	@for $level from 0 to 5{
+		tag-#{$level+1}{
+			font-size:.7em+($level*.5em);
+		}
+	}
+	tag-1 {font-size:1px}
+	tag-2 {font-size:2px}
+	tag-3 {font-size:3px}
+	tag-4 {font-size:4px}
+	tag-5 {font-size:5px}
+
+
+	06_3 / @while
+	$level:0;
+	@while $level < 5{
+		.tag-#{$level+1}{
+			font-size:.7em+($level*.5em);
+		}
+	}
+	tag-1 {font-size:1px}
+	tag-2 {font-size:2px}
+	tag-3 {font-size:3px}
+	tag-4 {font-size:4px}
+	tag-5 {font-size:5px}
+
+
+	06_4 / @each
+	.puma-ico {background:url('/images/puma.png')}
+	.crab-ico {background:url('/images/crab.png')}
+	.emu-ico {background:url('/images/emu.png')}
+	.duck-ico {background:url('/images/duck.png')}
+		↓
+	$animals : puma, crab, emu, duck;
+	@each $animal in $animals {
+		.#{$animal}-ico {background:url('/images/#{$animal}.png')}
+	}
+
+	06_5 / @function
+	function pxem($px, $context:16px){
+		@return ($px/@context)*1em;
+	}
+	h2 {font-size:pxem(45px);} // 2.8133m;
+
+
+07 / color
+	07_1 / rgba
+	a {color:rgba(255,255,255,.25)}
+		↓
+	a {color:rgba(#fff, .25)}
+	a {color:rgba(white, .25)}
+
+
+	07_2 / inspecting colors
+	$color:red;
+
+	hue($color); // 0deg
+	saturation($color); // 100%
+	lightness($color); // 50%
+	red($color); // 100
+	green($color); // 0
+	blue($color); // 0
+	alpha($color); // 100
+
+
+	07_3 / mainpulationg colors
+	invert(blue)
+	complement(#6cf620)
+	mix(red,yellow)
+	mix(red,yellow,30%)
+	grayscale(yellow)
+
+	
+	07_4 / hsla manipulations
+	adjust-hue(#77a7f9, 90)
+	adjust-hume(#77a7f9, -90)
+	saturate(#9b8a60, 50%)
+	desaturate(#9b8a60, 50%)
+	darken(#6cf620,30%)
+	lighten(#6cf620,30%)
+	fade-out(#fab,.5)
+	fade-in(rgba(#fab,.5),.5)
+
+
+	07_5 / 
+	change-color($color, [$red], [$green], [$blue], [$hue], [$saturation], [$lightness], [$alpha]);
+	change-color(#ba5637, $hue:60); //#19f65d
+	change-color(#8e9cb3, $saturation:100);	// #4288ff
+	change-color(#6cf620, $green:60, $blue:100); // #6c3c64
+
+	adjust-color($color, [$red], [$green], [$blue], [$hue], [$saturation], [$lightness], [$alpha]);
+	adjust-color(#d3fa7b, $hue:60, $lightness:-20%); //#19f65d	
+	adjus-color(#5f8fe3, $green:100, $alpha:-.25); //rgba(95,255,227,.75)
+
+	scale-color($color, [$red], [$green], [$blue], [$hue], [$saturation], [$lightness], [$alpha]);
+	scale-color(#adf609, #lightness:50%); //d6fa84
+

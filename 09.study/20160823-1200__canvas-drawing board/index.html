@@ -1,0 +1,242 @@
+<!doctype>
+<html>
+	<head>
+		<title>study | &#60;canvas&#62;</title>
+
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+		<style>
+			@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+
+			body {font-family:'nanumgothic';font-size:12px;}
+			body, body * {border:0;padding:0;margin:0;}
+
+			.canvas_wrap {text-align:right;margin:0 auto;width:1000px;}
+			.function_btns {text-align:center;padding:20px;}
+			.function_btns li {overflow:hidden;margin:0 0 8px;list-style:none;}
+			.function_btns li a {background:#efefed;border:1px solid #999;color:#444;display:inline-block;float:left;line-height:14px;text-decoration:none;text-transform:uppercase;padding:4px 10px;margin:0 0 0 4px;}
+			.function_btns li a:first-child {margin:0;}
+			.function_btns li a:hover {background:#999;color:#fff;}
+			
+			.erasor {overflow:hidden;}
+			.erasor p {float:left;}
+			.erasor .ui-widget.ui-widget-content {float:left;margin:8px 0 0 14px;width:200px;height:2px;}
+			.erasor .ui-state-default {background:#999;border-radius:50%;left:-5px;top:-5px;width:10px;height:10px;}
+			.erasor a.active,
+			.erasor a.active:hover {background:rgba(250,0,40,.4);border:1px solid rgba(250,0,40,1);}
+
+			.currpos {display:inline-block;}
+			.currpos p {display:inline-block;}
+			#artboard {border:1px solid #999;}
+		</style>
+	</head>
+	<body>
+		<!-- 
+			<canvas> TEST
+			Reference ; http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/#demo-simple
+		-->
+		
+		<div class="canvas_wrap">
+			<ul class="function_btns">
+				<li class="btn_clear">
+					<a href="#">All Clear</a>
+				</li>
+				<li class="erasor">
+					<a href="#">Erasor</a>
+					<div id="erasor"></div>
+				</li>
+				<li class="btn_color">
+					<a href="#" style="background:rgba(250,0,0,.3)" data-colorCode='rgb(250,0,0)'>Red</a>
+					<a href="#" style="background:rgba(125,0,0,.3)" data-colorCode='rgb(250,250,0)'>Yellow</a>
+					<a href="#" style="background:rgba(0,250,0,.3)" data-colorCode='rgb(0,250,0)'>Green</a>
+					<a href="#" style="background:rgba(0,0,250,.3)" data-colorCode='rgb(0,0,250)'>Blue</a>
+				</li>
+				<li class="btn_size">
+					<a href="#" data-brushSize='10'>Huge</a>
+					<a href="#" data-brushSize='7'>Large</a>
+					<a href="#" data-brushSize='4'>Normal</a>
+					<a href="#" data-brushSize='2'>Small</a>
+				</li>
+			</ul>
+			<canvas id="artboard" width="1000" height="600"></canvas>
+
+			<div class="currpos">
+				<p class="x">000</p> X <p class="y">000</p>
+			</div>
+		</div>
+		
+
+		<script type="text/javascript" src="./../jquery-1.12.4.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script> <!-- slider -->
+		<script>
+			var artboard = document.getElementById('artboard'); // 일부 ie 버전에서는 canvas 태그를 지원하지 않으므로 ID로 canvas 객체를 찾음.
+			context = artboard.getContext('2d');
+
+			var currX, currY,
+				paintChk, paintColorChk,
+				erasorChk = false;
+
+			var boardColor = '#fff'; // 아트보드 컬러
+
+			artboard.addEventListener('mousemove', function(e){
+				currX = e.pageX - this.offsetLeft;
+				currY = e.pageY - this.offsetTop;
+				viewCurrPos(currX, currY)
+			});
+
+			$('#artboard').mousedown(function(e){
+				paintChk = true;
+				paintColorChk =  true;		
+
+				var currPosX = e.pageX - this.offsetLeft,
+					currPosY = e.pageY - this.offsetTop;
+				
+				addClick(currPosX, currPosY);
+				drawing();
+			});
+			$('#artboard').mousemove(function(e){
+				if(paintChk){
+					addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+					drawing();
+				}	
+			});
+			$('#artboard').mouseup(function(e){
+				paintChk = false;
+				paintColorChk = false;
+			});
+			$('#artboard').mouseleave(function(e){
+				paintChk = false;
+				paintColorChk = false;
+			});
+
+
+			var clickX = new Array(),
+				clickY = new Array(),
+				clickDrag = new Array(),
+				clickColor = new Array(),
+				clickSize = new Array();
+
+			function addClick(x, y, dragging){ // save the click position
+				clickX.push(x);
+				clickY.push(y);
+				clickDrag.push(dragging);
+				
+				if(!erasorChk) clickColor.push(eachColor);
+				else clickColor.push('#fff');
+
+				if(!erasorChk) clickSize.push(eachSize);
+				else clickSize.push($('#erasor').slider('value'))
+			}
+			function drawing(){ // cleard and everthing is redrawn
+
+				var artboardW = artboard.width,
+					artboardH = artboard.height;
+				context.clearRect(0, 0, artboardW, artboardH);
+				context.lineJoin = "round";
+				//context.lineWidth = 4;
+
+				for(var i=0; i < clickX.length; i++) {		
+					context.save();
+					context.beginPath(); 
+					if(clickDrag[i] && i) context.moveTo(clickX[i-1], clickY[i-1]);
+					else context.moveTo(clickX[i]-1, clickY[i]);
+
+					context.lineTo(clickX[i], clickY[i]);
+					context.closePath();		
+					// option01 ; color
+					if(i==0) context.strokeStyle ='#999'
+					else context.strokeStyle = clickColor[i];
+
+					// option02 ; size
+					if(i==0) context.lineWidth = 4;
+					else context.lineWidth = clickSize[i];
+
+					context.stroke();
+				}		
+			}
+
+
+			// another function [clear]
+			$('.btn_clear').click(function(){
+				clearCanvas();
+				return false;
+			});
+			function clearCanvas(){
+				var artboardW = artboard.width,
+					artboardH = artboard.height;
+				context.fillStyle = boardColor;
+				context.clearRect(0, 0, artboardW, artboardH);
+				console.log('artboardW : ' + artboardW + '| artboardH : ' + artboardH)
+
+				// * clear 버튼을 누르면 일시적으로 내용이 사라지나 다시 canvas에 mousedown을 하면 이전에 그렸던 목록이 다시 생성됨.
+				clickX = [];
+				clickY = [];
+				clickDrag = [];
+			}
+			
+			// another function [erasor]
+
+			$(function(){
+				$('#erasor').slider({
+					//range : true,
+					min : 0,
+      				max : 100,
+					value : 0
+				});
+
+				var erasorBtn = $('.erasor a');
+				erasorBtn.removeClass('active')
+				erasorBtnSet();
+			});
+			$('.erasor a').click(function(){
+				erasorBtnSet(); 
+				return false;
+			});
+			function erasorBtnSet(){
+				if(!erasorBtn.hasClass('active')) {
+					erasorChk = true;
+					erasorBtn.addClass('active')
+				}else{
+					erasorChk = false;
+					erasorBtn.removeClass('active')
+				}
+				if(erasorChk) $('#erasor').slider('option', 'disabled', false);
+				else $('#erasor').slider('option', 'disabled', true);
+			}
+
+			// another function [color]
+			var eachColor = new Array();
+			$('.btn_color a').click(function(){
+				if(erasorChk) {
+					erasorChk = false;
+					erasorBtn.removeClass('active');
+				}
+				eachColor = $(this).attr('data-colorCode');
+				clickColor.push(eachColor);				
+				return false;
+			});
+
+			// another function [brushSize]
+			var eachSize = new Array();
+			$('.btn_size a').click(function(){
+				eachSize = $(this).attr('data-brushSize');
+				console.log('eachSize : ' + eachSize)
+				clickSize.push(eachSize);
+				return false;
+			});
+
+			// another function [current position]
+			function viewCurrPos(x, y){
+				$('.currpos').find('.x').text(x);
+				$('.currpos').find('.y').text(y)
+			}
+
+			// ★ 추가기능만들기
+			// undo http://bloodguy.tistory.com/entry/HTML5-%EC%A0%80%EC%9E%A5%EA%B0%80%EB%8A%A5%ED%95%9C-%EA%B7%B8%EB%A6%BC%ED%8C%90
+			// export to image http://bloodguy.tistory.com/entry/HTML5-%EC%A0%80%EC%9E%A5%EA%B0%80%EB%8A%A5%ED%95%9C-%EA%B7%B8%EB%A6%BC%ED%8C%90
+			// 사각형/삼각형/원 그리기 http://m.mkexdev.net/62
+			// 이미지 불러오기 http://m.blog.naver.com/wofmaker/100209762977
+			// 단축키만들기
+			// 컬러 선택에 컬러피커 활용
+		</script>
+	</body>
+</html>

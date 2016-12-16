@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>Lineage Red Knight</title>
+<link rel="stylesheet" type="text/css" href="../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../css/occupation.css" />
+<!--<script src="../js/ncjs.js"></script>-->
+<!--<script src="../js/common.js"></script>-->
+<script src="http://code.jquery.com/jquery-1.12.2.min.js"></script>
+<script>
+(function(){
+	function checkSize(){
+		var w = $(window).width() > 750 ? 75 : $(window).width()/10;
+		$('body').css('fontSize',w);
+	}
+
+	$(document).ready(function(){
+		$(window).on('resize', checkSize).trigger('resize');
+
+		var __isCounting = true;
+
+		// 시간 영역 toggle
+		$('.timeArea').on('click', function(){
+			var before = '<img src="../img/occupation/home_top_time_info_d3.png" />\
+					<div class="text next">2016 - 09 - 09 01 : 00 : 00</div>',
+				after = '<img src="../img/occupation/home_top_time_play_d3.png" />\
+					<div class="text time">16 : 13 : 27</div>\
+					<div class="text guild">1,247</div>\
+					<div class="text monster">28,444</div>',
+				self = $(this);
+
+			if( self.data('status') ){
+				self.data('status', false).html(before);
+				__isCounting = true;
+			}else{
+				self.data('status', true).html(after);
+				makeClick();
+				__isCounting = false;
+			}
+
+			function makeClick(){
+				var timer;
+
+				(function tictoc(){
+					clearTimeout(timer);
+					var target = self.find('.time'),
+						date = new Date(),
+						str = date.toString().split(' ')[4].split(':'),
+						ref = 60;
+
+					var h = 2,
+						m = ref-parseInt(str[1]),
+						s = ref-parseInt(str[2]);
+
+					if( !target[0] ) return;
+					target.text( h + ' : ' + m + ' : ' + s );
+					timer = setTimeout(tictoc, 1000);
+				})();
+			}
+		});
+
+		// 영지 선택 ============================================================================================
+		var __land = $('.landList'),
+			__map = $('.map');
+
+		$('.map .area').on('click', function(){
+			var self = $(this);
+
+			self.addClass('ani_click');
+			setTimeout(function(){
+				self.removeClass('ani_click');
+			},200);
+
+
+			// self.find('.box').attr('src', '../img/occupation/map_area_box_on.png');
+			// self.find('.wind').attr('src', '../img/occupation/map_area_wind_3.png');
+
+			setTimeout(function(){
+				$('#layer_insert').show().addClass('ani_popup');
+			}, 200);
+
+			$('#layer_insert').find('.btn_cancel').one('click',function(){
+				setTimeout(function(){
+					$('#layer_insert').hide().removeClass('ani_popup');
+				}, 200);
+				$('#layer_insert').find('.btn_save').off('click');
+			});
+			$('#layer_insert').find('.btn_save').one('click',function(){
+				setTimeout(function(){
+					$('#layer_insert').hide();
+					if(!counter) return;
+
+					_alert('소환수 '+ counter +'마리 투입을 완료하였습니다!!', function(){
+						self.find('.box').attr('src', '../img/occupation/map_area_box_on.png');
+						self.append('<img class="icon rolling" src="../img/occupation/map_area_icon_doing_crop.png" />');
+						self.find('.text span').text(counter);
+					}, true);
+				}, 200);
+			});
+
+			var counter = 0, counterArea = $('#layer_insert').find('.myMonster').text(counter);
+
+			$('#layer_insert').find('.btn_plus').on('click', function(){
+				if(counter == 30) return;
+				counter++;
+				counterArea.text(counter);
+			});
+			$('#layer_insert').find('.btn_minus').on('click', function(){
+				if(counter == 0) return;
+				counter--;
+				counterArea.text(counter);
+			});
+			$('#layer_insert').find('.btn_max').on('click', function(){
+				counter = 30;
+				counterArea.text(counter);
+			});
+
+		});
+
+		$('.land').on('click', function(){
+			var self = $(this);
+
+			self.addClass('ani_click');
+			setTimeout(function(){
+				self.removeClass('ani_click');
+
+				if( __isCounting ){
+					_alert('지금은 정산 중 입니다.');
+					return;
+				}
+
+				__land.addClass('ani_expand');
+				__map.find('.subtitle').attr('src','../img/occupation/map_subtitle_0'+ (self.index()+1) +'.png');
+				__map.show().addClass('ani_into');
+				
+				setTimeout(function(){
+					__land.hide().removeClass('ani_expand');
+					__map.removeClass('ani_into');
+				}, 500);
+			},200);
+
+			// self.append('<img class="icon" src="../img/occupation/land_icon_check.png" />');
+		});
+
+		$('.btn_select_land').on('click', function(){
+			__land.show().addClass('ani_contract');
+			__map.addClass('ani_out');
+
+			__land.find('.icon').remove();
+
+			setTimeout(function(){
+				__land.removeClass('ani_contract');
+				__map.hide().removeClass('ani_out');
+			}, 500);
+		});
+
+		$('.btn_view').on('click', function(){
+			var layer = $('#layer_record').show();
+			layer.find('.cont .btn_close').one('click', function(){
+				setTimeout(function(){
+					layer.hide();
+				},200);
+			});
+			layer.find('li').on('click', function(){
+				layer.find('.detail_pop').show();
+				layer.find('.detail_pop').find('.btn_close').one('click', function(){
+					setTimeout(function(){
+						layer.find('.detail_pop').hide();
+					},200);
+				});
+			});
+		});
+
+		// 경고창 열기 ==========================================================
+		function _alert($msg, $callback, $share){
+			var target = $('#layer_alert').show().addClass('ani_popup');
+			target.find('.comment').text($msg);
+
+			if($share){
+				target.find('button').eq(0).show();
+				target.find('button').eq(1).show();
+			}else{
+				target.find('button').eq(0).hide();
+				target.find('button').eq(1).hide();
+			}
+
+			target.find('button').one('click', function(){
+				setTimeout(function(){
+					target.hide().removeClass('ani_popup');
+					if( typeof $callback == 'function' ) $callback.call();
+				}, 200);
+			});
+		}
+
+		// 레이어 열기 ==========================================================
+		$('.btn_help').on('click', function(){
+			var layer = $('#layer_help').show();
+			layer.find('.btn_confirm').one('click', function(){
+				setTimeout(function(){
+					layer.hide();
+				}, 200);
+			});
+		});
+
+		$('.btn_guide').on('click', function(){
+			var layer = $('#layer_info').show();
+			layer.find('.btn_confirm').one('click', function(){
+				setTimeout(function(){
+					layer.hide();
+				}, 200);
+			});
+		});
+
+		// bottom ===============================================================
+		$('.bottom').find('button').each(function($i,$item){
+			var self = $($item);
+
+			self.on('click', function(){
+				switch ($i) {
+					case 0 : 
+						$('#layer_guildRank').show();
+						$('#layer_guildRank').find('.btn_confirm').on('click', function(){$('#layer_guildRank').hide();});
+					break;
+					case 1 :
+						location.href = 'http://rc.buff.plaync.com/rk/col/html/index.html';
+					break;
+				}
+
+			});
+		});
+
+		// 버튼 액션 공통 ===========================================================
+		$('button').on('click', function(){
+			var self = $(this);
+
+			self.addClass('ani_click');
+			setTimeout(function(){
+				self.removeClass('ani_click');
+			},200);
+		});
+	});
+})();
+</script>
+</head>
+<body>
+
+<div class="wrapper">
+	<!-- header -->
+	<div class="header">
+		<div class="profileImg">
+			<img class="image" src="../img/collection/temp_profile_img.png" />
+			<img class="cover" src="../img/common/header_profile_bg.png" />
+		</div>
+		<div class="profile">
+			<div class="server">파죽지세</div>
+			<div class="guild">헌터스어트벤처혈맹</div>
+			<div class="name">4위면도미닉</div>
+		</div>
+		<div class="info dagger">
+			<span class="number">250</span>
+			<img src="../img/_lang/ko/common/header_info_dagger.png" />
+		</div>
+		<div class="info summons">
+			<span class="number">30</span>
+			<img src="../img/_lang/ko/common/header_info_summons.png" />
+		</div>
+		<button class="btn_guide"><img src="../img/common/header_btn_guide.png" /></button>
+	</div>
+
+
+	<!-- container -->
+	<div class="container">
+		<!-- 진행중 : playing -->
+		<div class="timeArea">
+			<img src="../img/_lang/ko/occupation/time_bg_playing.png" />
+			<div class="text time">16 : 13 : 27</div>
+			<div class="text guild">1,247</div>
+			<div class="text monster">28,444</div>
+		</div>
+		<div class="missionText"><img src="../img/_lang/ko/occupation/mission_playing_land.png" /></div>
+
+		<!-- 결과확인중 : checking -->
+		<!--<div class="timeArea">
+			<img src="../img/occupation/time_bg_checking.png" />
+			<div class="text remaintime">16 : 13 : 27</div>
+			<div class="text guild">1,247</div>
+			<div class="text monster">28,444</div>
+		</div>
+		<div class="missionText"><img src="../img/occupation/mission_checking.png" /></div>-->
+
+		<!-- 전투준비중 : waiting -->
+		<!--<div class="timeArea">
+			<img src="../img/occupation/time_bg_waiting.png" />
+			<div class="text next">2016 - 09 - 09 01 : 00 : 00 <span class="timezone">(GMT+7)</span></div>
+		</div>
+		<div class="missionText"><img src="../img/occupation/mission_waiting.png" /></div>-->
+
+
+		<div class="mapArea">
+			<img class="bg_bar" src="../img/common/bar_bg_bottom.png" />
+
+			<!-- 영지선택 -->
+			<div class="landList" style="display:none;">
+				<div class="land land1">
+					<img src="../img/_lang/ko/occupation/land_1.png" />
+					<img class="icon" src="../img/occupation/land_icon_check.png" />
+					<div class="count">10</div>
+				</div>
+				<div class="land land2">
+					<img src="../img/_lang/ko/occupation/land_2.png" />
+					<div class="count">10</div>
+				</div>
+				<div class="land land3">
+					<img src="../img/_lang/ko/occupation/land_3.png" />
+					<div class="count">10</div>
+				</div>
+				<div class="land land4">
+					<img src="../img/_lang/ko/occupation/land_4.png" />
+					<div class="count">10</div>
+				</div>
+				<div class="land land5">
+					<img src="../img/_lang/ko/occupation/land_5.png" />
+					<div class="count">10</div>
+				</div>
+				<div class="land land6">
+					<img src="../img/_lang/ko/occupation/land_6.png" />
+					<div class="count">10</div>
+				</div>
+				<div class="land land7">
+					<img src="../img/_lang/ko/occupation/land_7.png" />
+					<div class="count">10</div>
+				</div>
+			</div>
+
+			<!-- 거점선택 -->
+			<div class="map type1" style="display:;">
+				<img class="bg" src="../img/occupation/map_land_bg_1.png" />
+				<div class="mapInfo">
+					<img class="subtitle" src="../img/_lang/ko/occupation/map_subtitle_01.png" />
+					<img src="../img/_lang/ko/occupation/map_insert_status.png" />
+					<span class="number insert_my">30</span>
+					<span class="number insert_guild">900</span>
+				</div>
+
+				<div class="area area1">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_5.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_1.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<!--<img class="icon rolling" src="../img/occupation/map_area_icon_doing_crop.png" />-->
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area2">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_5.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_2.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<!--<img class="icon check" src="../img/occupation/map_area_icon_check.png" />-->
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area3">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_5.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_3.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<!--<img class="icon check" src="../img/occupation/map_area_icon_doing.png" />-->
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area4">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_4.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_4.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area5">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_4.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_5.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area6">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_5.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_6.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area7">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_5.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_7.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area8">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_3.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_8.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area9">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_5.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_9.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+				<div class="area area10">
+					<img class="box" src="../img/occupation/map_area_box.png" />
+					<img class="icon wind" src="../img/occupation/map_area_wind_5.png" />
+					<img class="icon number" src="../img/occupation/map_area_num_10.png" />
+					<img class="icon counter" src="../img/occupation/map_area_counter.png" />
+					<div class="icon text"><span class="my">30</span><span class="guild">900</span></div>
+				</div>
+
+				<button class="btn_select_land"><img src="../img/_lang/ko/occupation/map_btn_select.png" /></button>
+				<button class="btn_help"><img src="../img/_lang/ko/occupation/map_btn_help.png" /></button>
+			</div>
+		</div>
+
+		<!-- status -->
+		<div class="statusArea">
+			<img class="bg_bar" src="../img/common/bar_bg_top.png" />
+			<img class="bg" src="../img/_lang/ko/occupation/statusArea_bg.png" />
+			<div class="text insert_my"><span>12</span>/30</div>
+			<div class="text insert_guild">306</div>
+			<div class="text insert_member">26,000</div>
+			<button class="btn_view"><img src="../img/_lang/ko/occupation/statusArea_btn_view.png" /></button>
+		</div>
+	</div>
+
+	<!-- bottom -->
+	<div class="bottom">
+		<button class="btn_ranking"><img src="../img/_lang/ko/common/bottom_rank.png" /></button>
+		<button class="btn_goto_game2"><img src="../img/_lang/ko/common/bottom_game1.png" /></button>
+		<button class="btn_goto_game3"><img src="../img/_lang/ko/common/bottom_game3.png" /></button>
+	</div>
+
+
+	<!-- layer : 소환수 투입 -->
+	<div class="layer" id="layer_insert" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="insert_monster">
+			<div class="cont">
+				<img src="../img/_lang/ko/occupation/insert/bg.png" />
+				<div class="titleArea">
+					<div class="position">1-1</div>
+					<img class="name" src="../img/_lang/ko/occupation/insert/title_01.png" />
+					<img class="level" src="../img/_lang/ko/occupation/layer/area_icon_level_1.png" />
+				</div>
+				<div class="countArea">
+					<div class="guildMonster">900</div>
+					<div class="myMonster">30</div>
+					<div class="countBtns">
+						<button class="btn_plus"><img src="../img/occupation/insert/btn_plus.png" /></button>
+						<button class="btn_minus"><img src="../img/occupation/insert/btn_minus.png" /></button>
+						<button class="btn_max"><img src="../img/occupation/insert/btn_max.png" /></button>
+					</div>
+				</div>
+				<div class="descArea"><span class="guildName">다크나이트 혈맹</span><span class="monsterCount">95마리</span></div>
+				<div class="btnArea">
+					<button class="btn_save"><img src="../img/_lang/ko/occupation/insert/btn_save.png" /></button>
+					<button class="btn_cancel"><img src="../img/_lang/ko/occupation/insert/btn_cancel.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- layer : 소환수 투입 완료 -->
+	<div class="layer" id="layer_insert_complete" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="insert_complete">
+			<div class="cont">
+				<img src="../img/_lang/ko/occupation/insert/complete_bg.png" />
+				<div class="titleArea">
+					<div class="position">1-1</div>
+					<img class="name" src="../img/_lang/ko/occupation/insert/title_01.png" />
+					<img class="level" src="../img/_lang/ko/occupation/layer/area_icon_level_1.png" />
+				</div>
+				<div class="resultArea">
+					<span class="point">+7</span>
+					<span class="userMonsterCount">5</span>
+					<span class="guildMonstercount">8</span>
+				</div>
+				<div class="rankArea">
+					<div class="item rank_first"><span class="name">데스나이트</span><span class="number">222</span></div>
+					<div class="item rank_my"><span class="name">엔씨소프트</span><span class="number">8</span></div>
+				</div>
+				<div class="btnArea">
+					<button class="btn"><img src="../img/_lang/ko/occupation/insert/btn_sns.png" /></button>
+					<button class="btn"><img src="../img/_lang/ko/occupation/insert/btn_ally.png" /></button>
+					<button class="btn fix_right"><img src="../img/_lang/ko/occupation/insert/btn_confirm.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- layer : 안내사항 -->
+	<div class="layer" id="layer_info" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="information">
+			<div class="cont">
+				<img src="../img/_lang/ko/occupation/layer/information.png" />
+				<div class="btnArea">
+					<button class="btn_confirm"><img src="../img/_lang/ko/occupation/layer/btn_confirm.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- layer : 도움말 -->
+	<div class="layer" id="layer_help" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="information">
+			<div class="cont">
+				<img src="../img/_lang/ko/occupation/layer/help.png" />
+				<div class="btnArea">
+					<button class="btn_confirm"><img src="../img/_lang/ko/occupation/layer/btn_confirm.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- layer : 점령기록 -->
+	<div class="layer" id="layer_record" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="record">
+			<div class="cont">
+				<img src="../img/_lang/ko/occupation/layer/record_bg.png" />
+				<ul class="record_list">
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li class="selected">
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="date">12/31</span>
+						<span class="win">99/99</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+				</ul>
+				<div class="btnArea">
+					<button class="btn_close"><img src="../img/_lang/ko/occupation/layer/btn_close.png" /></button>
+				</div>
+				<div class="paging">
+					<button class="btn_prev"><img src="../img/_lang/ko/occupation/layer/btn_prev.png" /></button>
+					<span class="count">1/10</span>
+					<button class="btn_next"><img src="../img/_lang/ko/occupation/layer/btn_next.png" /></button>
+				</div>
+			</div>
+			<!-- 상세결과 -->
+			<div class="detail_pop" style="display:none;">
+				<img src="../img/_lang/ko/occupation/layer/record_detail_bg.png" />
+				<div class="title">9월9일 점령전 결과입니다.</div>
+				<div class="reward">
+					<span class="dagger">15개</span>
+					<span class="point">39점</span>
+					<span class="guildName">다크나이트</span>
+					<span class="guildRank">55위</span>
+				</div>
+				<div class="daggerScore">
+					<span>5</span>
+					<span>5</span>
+					<span>5</span>
+					<span>5</span>
+					<span class="sum">-</span>
+				</div>
+				<ul class="result">
+					<li><span>5</span><span>5</span><span>5</span><span>5</span><span class="score">-</span></li>
+					<li><span>5</span><span>5</span><span>5</span><span>5</span><span class="score">39</span></li>
+					<li><span>5</span><span>5</span><span>5</span><span>5</span><span class="score">0</span></li>
+					<li><span>5</span><span>5</span><span>5</span><span>5</span><span class="score">0</span></li>
+					<li><span>5</span><span>5</span><span>5</span><span>5</span><span class="score">39</span></li>
+				</ul>
+				<div class="btnArea">
+					<button class="btn_close"><img src="../img/_lang/ko/occupation/layer/btn_close.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- layer : 경고창 텍스트 -->
+	<div class="layer" id="layer_alert" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="alert">
+			<img class="bg" src="../img/common/layer/alert_bg.png" />
+			<div class="cont">
+				<div class="comment">소환수 투입 완료!</div>
+				<div class="btnArea">
+					<button class="btn"><img src="../img/_lang/ko/occupation/layer/pop_btn_sns.png" /></button>
+					<button class="btn"><img src="../img/_lang/ko/occupation/layer/pop_btn_ally.png" /></button>
+					<button class="btn"><img src="../img/_lang/ko/occupation/layer/pop_btn_confirm.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- layer : 혈맹 랭킹 -->
+	<div class="layer" id="layer_guildRank" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="ranking">
+			<div class="cont">
+				<img class="bg" src="../img/_lang/ko/common/layer/rank_top.png" />
+				<div class="tabArea">
+					<button class="tab"><img src="../img/_lang/ko/common/layer/rank_tab_0_on.png" /></button>
+					<button class="tab"><img src="../img/_lang/ko/common/layer/rank_tab_1.png" /></button>
+					<button class="tab"><img src="../img/_lang/ko/common/layer/rank_tab_2.png" /></button>
+				</div>
+				<div class="list">
+					<ol>
+						<li><div class="name">에반게리온</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">영원히비와이</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">10억짜리 열매</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">4위면도미닉</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">점점늘어나는팔로</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">엔씨소프트</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">GOODMUSIC</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">카카오스토리</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">백두산</div><div class="count"><span>1,234</span>개</div></li>
+						<li><div class="name">시크릿어벤져스</div><div class="count"><span>1,234</span>개</div></li>
+					</ol>
+					<img class="bg" src="../img/common/layer/rank_body.png" />
+				</div>
+				<!--<div class="message">
+					<img class="bg" src="../img/common/layer/rank_message_join.png" />
+					<button class="btn_join"><img src="../img/common/layer/alert_btn_ally.png" /></button>
+				</div>-->
+				<div class="message">
+					<div class="current">나의 혈맹 <span class="name">에반게리온</span>의 랭킹은 <span class="rank">1003</span>위입니다.</div>
+					<div class="collect">보유 소환수 <span class="qty">1,423</span>개</div>
+				</div>
+				<img class="bg" src="../img/_lang/ko/common/layer/rank_bottom.png" />
+				<div class="btnArea">
+					<button class="btn_refresh"><img src="../img/_lang/ko/common/layer/pop_btn_refresh.png" /></button>
+					<button class="btn_confirm"><img src="../img/_lang/ko/common/layer/pop_btn_confirm.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</body>
+</html>

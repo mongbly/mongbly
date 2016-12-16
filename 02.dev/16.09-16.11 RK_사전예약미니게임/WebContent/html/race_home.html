@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>Lineage Red Knight</title>
+<link rel="stylesheet" type="text/css" href="../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../css/race.css" />
+<script src="../js/lang_kor.js"></script>
+<script src="../js/ncjs.js"></script>
+<!--<script src="../js/common.js"></script>-->
+<script>
+// check resize ==========================================================================================
+var MAX_WIDTH = 480;
+(function($){
+	var __wrapper;
+
+	function _checkSize(){
+		var ref = window.innerWidth;
+		ref = ref < MAX_WIDTH ? ref : MAX_WIDTH;
+
+		__wrapper.width(ref);
+		document.body.style.fontSize = (ref/10) + 'px';
+	}
+
+	$.$init(function(){
+		__wrapper = $.$sprite.ADD($.$find('.wrapper'));
+		stage.addEvent('resize', _checkSize).trigger('resize');
+	});
+})(ncjs);
+</script>
+<script src="../js/running.js"></script>
+<script src="../js/race.js"></script>
+</head>
+<body>
+
+<div class="wrapper">
+	<!-- header -->
+	<div class="header"></div>
+
+	<!-- container -->
+	<div class="container">
+
+		<div class="infoArea">
+
+			<!-- 경기 준비 중 : waiting -->
+			<!--<div class="timeArea">
+				<div class="txt clock">01 : 00 : 00</div>
+				<img src="../img/race/info_timeArea_waiting.png" />
+			</div>
+			<div class="gameTitle">
+				<img src="../img/race/info_title_waiting.png" />
+			</div>-->
+
+			<!-- 신청 중 : playing -->
+			<div class="timeArea">
+				<div class="txt game">10경기</div>
+				<div class="txt countdown">06 : 13 : 27</div>
+				<div class="txt guild">1,247</div>
+				<div class="txt all">28,444</div>
+				<img src="../img/_lang/ko/race/info_timeArea_playing.png" />
+			</div>
+			<div class="gameTitle">
+				<img src="../img/_lang/ko/race/info_title_playing.png" />
+			</div>
+
+			<!-- 결과 보기 화면 : replay -->
+			<!--<div class="timeArea replay">
+				<div class="txt game">10경기</div>
+				<div class="txt time">2016/09/09 18:00 <span class="timezone">(GMT+7)</span></div>
+				<div class="txt guild">1,247</div>
+				<div class="txt all">28,444</div>
+				<img src="../img/race/info_timeArea_replay.png" />
+			</div>
+			<div class="gameTitle">
+				<span class="text"><span class="game">10경기</span> 레이스 결과입니다</span>
+				<img src="../img/race/info_title_bg.png" />
+			</div>-->
+
+		</div>
+
+		<div class="raceArea">
+			<img class="bg_bar" src="../img/common/bar_bg_bottom.png" />
+
+			<!-- 경기 대기실 -->
+			<div class="waitingView">
+				<img class="bg" src="../img/race/wait_bg.jpg" />
+				<div class="players">
+					<div class="player line1 ani_jump"><img src="../img/collection/monster/0/show_large.png" /></div>
+					<div class="player line2 ani_turn"><img src="../img/collection/monster/1/show_large.png" /></div>
+					<div class="player line3 ani_tilt"><img src="../img/collection/monster/2/show_large.png" /></div>
+					<div class="player line4 ani_zoom"><img src="../img/collection/monster/3/show_large.png" /></div>
+					<div class="player line5 ani_stretch"><img src="../img/collection/monster/4/show_large.png" /></div>
+				</div>
+			</div>
+			<div class="button btn_apply">
+				<span>11경기</span>
+				<img src="../img/_lang/ko/race/btn_apply.png" />
+			</div>
+			<div class="button btn_show_result">
+				<span>10경기</span>
+				<img src="../img/_lang/ko/race/btn_show_result.png" />
+			</div>
+
+			<!-- 다시보기 화면 : replay -->
+			<!--<div class="raceView">
+				<div class="players">
+					<div class="player line1" style="left:4%;"><img src="../img/race/monster/0/00.png" /></div>
+					<div class="player line2" style="left:4%;"><img src="../img/race/monster/1/00.png" /></div>
+					<div class="player line3" style="left:4%;"><img src="../img/race/monster/2/00.png" /></div>
+					<div class="player line4" style="left:4%;"><img src="../img/race/monster/3/00.png" /></div>
+					<div class="player line5" style="left:4%;"><img src="../img/race/monster/4/00.png" /></div>
+				</div>
+				<div class="track">
+					<div class="item" style="left:0%;"><img src="../img/race/run_0.jpg" /></div>
+					<div class="item" style="left:100%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:170%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:240%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:310%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:380%;"><img src="../img/race/run_1.jpg" /></div>
+					<div class="item" style="left:450%;"><img src="../img/race/run_2.jpg" /></div>
+				</div>
+				<div class="countdown"><img src="../img/race/countdown_3.png" /></div>
+			</div>
+			<button class="button btn_goto_waiting"><img src="../img/race/btn_goto_waiting.png" /></button>
+			<button class="button btn_replay"><img src="../img/race/btn_replay.png" /></button>-->
+
+		</div>
+
+		<!-- status -->
+		<div class="statusArea">
+			<img class="bg_bar" src="../img/common/bar_bg_top.png" />
+
+			<!-- 경기 준비 중 : waiting -->
+			<!--<img class="bg" src="../img/_lang/ko/race/status_waiting.png" />
+			<button class="btn_view"><img src="../img/_lang/ko/occupation/statusArea_btn_view.png" /></button>-->
+
+			<!-- 신청 중 : playing -->
+			<!--<img class="bg" src="../img/race/status_playing.png" />
+			<img class="icon" src="../img/race/icon_complete.png" />
+			<div class="text monster_name">다크엘프 스카우터</div>
+			<div class="text insert_guild">306</div>
+			<button class="btn_view"><img src="../img/_lang/ko/occupation/statusArea_btn_view.png" /></button>-->
+
+			<!-- 결과 보기 화면 : replay -->
+			<img class="bg" src="../img/_lang/ko/race/status_replay.png" />
+			<img class="icon" src="../img/_lang/ko/race/icon_fail.png" />
+			<div class="text monster_name">다크엘프 스카우터</div>
+			<div class="text dagger">306</div>
+			<div class="text point">306</div>
+			<div class="text rank">306</div>
+		</div>
+
+	</div>
+
+	<!-- bottom -->
+	<div class="bottom"></div>
+
+
+	<!-- layer : 도움말 -->
+	<div class="layer" id="layer_help" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="information">
+			<div class="cont">
+				<img src="../img/_lang/ko/race/layer/help.png" />
+				<div class="btnArea">
+					<button class="btn_confirm"><img src="../img/_lang/ko/race/layer/btn_confirm.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- layer : 레이스 리플레이 결과 보기 -->
+	<div class="layer" id="layer_replay_result" style="display:none;">
+		<div class="dimmed clear"></div>
+		<div class="replay_result">
+			<div class="cont">
+				<img src="../img/_lang/ko/race/layer/result_bg.png" />
+				<ul class="result">
+					<li>시댄서</li>
+					<li>스파토이</li>
+					<li>에티</li>
+					<li>늑대인간</li>
+					<li>데스나이트</li>
+				</ul>
+				<div class="monsterView"><img src="../img/collection/monster/0/show_large.png" /></div>
+				<div class="btnArea">
+					<button class="btn_close"><img src="../img/_lang/ko/race/layer/btn_close.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- layer : 소환수선택 -->
+	<div class="layer" id="layer_selection" style="display:;">
+		<div class="dimmed"></div>
+		<div class="selection">
+			<div class="cont">
+				<img src="../img/_lang/ko/race/layer/selection_bg.png" />
+				<div class="monster_list">
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/0/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+						<img class="icon border ani_select" src="../img/collection/smn_icon_border.png" />
+						<img class="icon check" src="../img/collection/smn_icon_check.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/1/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+						<img class="icon counter" src="../img/collection/smn_icon_counter.png" />
+						<span class="guildCounter">999</span>
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/2/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/3/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/4/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/5/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/6/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/7/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/8/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/9/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/10/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/11/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/12/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/13/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/14/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/15/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/16/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/17/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/18/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/19/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/20/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/21/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/22/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/23/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/24/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/25/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/26/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/27/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/28/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+					<div class="monster">
+						<img src="../img/collection/smn_icon_size.png" />
+						<img class="icon image" src="../img/collection/monster/29/list_monster_on.png" />
+						<img class="icon cover" src="../img/collection/smn_icon_cover_on.png" />
+					</div>
+				</div>
+				<div class="btnArea">
+					<button class="btn_save"><img src="../img/_lang/ko/race/layer/selection_btn_save.png" /></button>
+					<button class="btn_close"><img src="../img/_lang/ko/race/layer/selection_btn_cancel.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- layer : 소환수선택 -->
+	<div class="layer" id="layer_selection_detail" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="selection_detail">
+			<div class="cont">
+				<img src="../img/_lang/ko/race/layer/selection_detail_bg.png" />
+				<div class="title">데스타이트</div>
+				<div class="status">보유</div>
+				<button class="btn_prev"><img src="../img/race/layer/btn_prev.png" /></button>
+				<button class="btn_next"><img src="../img/race/layer/btn_next.png" /></button>
+				<div class="monster_view">
+					<img class="image" src="../img/collection/monster/4/show_large.png" />
+					<img class="comment" src="../img/_lang/ko/race/layer/select_detail_comment_01.png" />
+				</div>
+				<div class="history">
+					<span>10회</span>
+					<span>1회</span>
+					<span>12명</span>
+				</div>
+				<div class="btnArea">
+					<button class="btn_save"><img src="../img/_lang/ko/race/layer/btn_apply.png" /></button>
+					<button class="btn_close"><img src="../img/_lang/ko/race/layer/btn_close.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- layer : 레이스 기록 -->
+	<div class="layer" id="layer_record" style="display:none;">
+		<div class="dimmed"></div>
+		<div class="record">
+			<div class="cont">
+				<img src="../img/_lang/ko/race/layer/record_bg.png" />
+				<ul class="record_list">
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li class="selected">
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+					<li>
+						<span class="order">1</span>
+						<span class="apply">데스나이트</span>
+						<span class="score">10</span>
+						<span class="rank">1254</span>
+						<span class="dagger">1,920개</span>
+					</li>
+				</ul>
+				<div class="btnArea">
+					<button class="btn_close"><img src="../img/_lang/ko/occupation/layer/btn_close.png" /></button>
+				</div>
+				<div class="paging">
+					<button class="btn_prev"><img src="../img/_lang/ko/occupation/layer/btn_prev.png" /></button>
+					<span class="count">1/10</span>
+					<button class="btn_next"><img src="../img/_lang/ko/occupation/layer/btn_next.png" /></button>
+				</div>
+			</div>
+			<!-- 상세결과 -->
+			<div class="detail_pop" style="display:none;">
+				<img src="../img/_lang/ko/race/layer/record_detail_bg.png" />
+				<div class="title"><span class="game">10경기</span> 결과입니다.</div>
+				<div class="gameTime">경기 시각 : 2016/09/07 18:00</div>
+				<div class="summary">시댄서가 출전하여 1위를 기록했습니다.</div>
+				<div class="reward">
+					<span class="dagger">15개</span>
+					<span class="point">39점</span>
+					<span class="guildName">다크나이트</span>
+					<span class="guildRank">55위</span>
+				</div>
+				<div class="daggerScore">
+					<span>5</span>
+					<span>5</span>
+					<span>5</span>
+					<span class="sum">-</span>
+				</div>
+				<ul class="result">
+					<li>시댄서</li>
+					<li>스파토이</li>
+					<li>에티</li>
+					<li>늑대인간</li>
+					<li>데스나이트</li>
+				</ul>
+				<div class="monsterView"><img src="../img/collection/monster/0/show_large.png" /></div>
+				<div class="btnArea">
+					<button class="btn_close"><img src="../img/_lang/ko/occupation/layer/btn_close.png" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</body>
+</html>
