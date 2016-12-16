@@ -1,0 +1,178 @@
+<!doctype>
+<html>
+<head></head>
+<body>
+	<style>
+		body {background:#000}
+		#wrap {width:620px;margin:0 auto;}
+		section {background:rgba(250,250,250,.8);border:1px solid #999;margin:60px 0 0;position:relative;height:480px;}
+		section .tit {color:#fff;font-size:14px;font-weight:bold;position:absolute;left:20px;top:20px;}
+		section .guide {border-radius:50%;border:10px solid rgba(250,250,250,.6);box-sizing:border-box;overflow:hidden;position:absolute;}
+		section ul {color:#fff;font-size:12px;overflow:hidden;position:absolute;right:20px;bottom:20px;}
+		section li {float:left;list-style:none;margin:0 0 0 20px;}
+		section li span {font-weight:bold;}
+
+		.guide, #canvas {position:absolute;left:60px;bottom:80px;width:240px;height:240px;}
+	}
+
+	</style>
+	<div id="wrap">
+		<div class="target"></div>
+
+		<section>
+			<div class="tit">2. 원그리기</div>
+			<div class="artboard">
+				<div class="guide"></div>
+				<canvas id="canvas" width="240" height="240"></canvas>
+			</div>
+			<ul>
+				<li>x : <span>0</span></li>
+				<li>y : <span>0</span></li>
+			</ul>
+		</section>
+		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script>
+			$(function(){
+				init();
+			});
+
+			var mouseChk = false;
+			var circleSection;
+
+			var startX;
+			var oldX;
+			var guideW;
+
+			function init(){
+				circleSection = 1;
+				guideW = $('.guide').width();
+				
+				ctx.strokeStyle = '#00abcd';
+			    ctx.lineWidth = 10;	
+			    lineW = ctx.lineWidth;
+			}
+
+			var cvs = document.getElementById('canvas');
+			var ctx = cvs.getContext('2d');
+
+			var lineW;
+			var angle = [1.5, 0, 0.5, 1];
+
+			$('section').mousedown(function(e){
+				mouseChk = true;
+				startX = e.offsetX;
+				mousePosChk(e.offsetX, e.offsetY);
+			});
+			$('section').mousemove(function(e){
+				if(!mouseChk) return;
+				mousePosChk(e.offsetX, e.offsetY);
+							
+				var r = guideW/2;
+				var diff = circleSection%2!=0 ? e.offsetX-startX : startX-e.offsetX
+				// console.log(circleSection + ' : ' + diff)	
+
+				if(diff <= 0) diff = '';
+				if(diff >= r) diff = r;
+
+				var p = parseInt(diff/r*100);
+				if(diff!='') cvsDraw(r, p);
+
+				if(circleSection==1 && guideW/2<=diff){
+					cvsDraw(r, angle[circleSection+1]*Math.PI)
+					circleSection=2;
+					startX = e.offsetX;
+				}else if(circleSection==2){// && guideW/2<=diff){
+
+					console.log(guideW/2<=diff)
+					// cvsDraw(r, angle[circleSection+1]*Math.PI)
+					// circleSection=3;
+					// startX = e.offsetX;
+				}
+				
+
+			});
+			$('section').mouseup(function(e){
+				mousePosChk(e.offsetX, e.offsetY);
+				mouseChk = false;
+			});
+
+			function mousePosChk(x, y){
+				$('section ul li').eq(0).find('span').html(x);
+				$('section ul li').eq(1).find('span').html(y);
+			}
+
+			function cvsDraw($radius, $percent){
+				var start = angle[circleSection]*Math.PI;
+				var	end = circleSection!=3 ? angle[circleSection+1]*Math.PI : angle[0]*Math.PI;
+
+		        ctx.beginPath();
+		        ctx.arc($radius+lineW, $radius+lineW, $radius+lineW/2, start, $percent*end/100, false); // .arc(x,y,r,sAngle,eAngle,counterclockwise);
+
+		        ctx.stroke();
+			}
+
+// var cvs = document.getElementById('canvas');
+// var ctx = cvs.getContext('2d');
+// ctx.lineWidth = 23;
+// ctx.textAlign = 'center';
+// ctx.textBaseline = 'middle';
+// ctx.font = '25px Trebuchet MS';
+// ctx.fillStyle = 'white';
+
+// /**
+//  * @closure
+//  */
+// var draw = (function () {
+//     var start = 1.5 * Math.PI; // Start circle from top
+//     var end = (2 * Math.PI) / 100; // One percent of circle
+
+//     /**
+//      * Draw percentage of a circle
+//      *
+//      * @param {number} r Radius
+//      * @param {number} p Percentage of circle
+//      * @param {string} c Stroke color
+//      * @return void
+//      */
+//     return function (r, p, c) {
+//         p = p || 100; // When time is '00' we show full circle
+//         ctx.strokeStyle = c;
+//         ctx.beginPath();
+//         ctx.arc(175, 175, r, start, p * end + start, false);
+//         ctx.stroke();
+//     };
+// }());
+
+// var clock = function () {
+//     requestAnimationFrame(clock);
+
+//     var date = new Date;
+//     var h = date.getHours();
+//     var m = date.getMinutes();
+//     var s = date.getSeconds();
+//     // Calculate percentage to be drawn
+//     var hp = 100 / 12 * (h % 12);
+//     var mp = 100 / 60 * m;
+//     var sp = 100 / 60 * s;
+//     // Ensure double digits
+//     h = h < 10 ? '0' + h : h;
+//     m = m < 10 ? '0' + m : m;
+//     s = s < 10 ? '0' + s : s;
+
+//     ctx.clearRect(0, 0, 350, 350);
+//     ctx.fillText(h + ':' + m + ':' + s, 175, 175);
+//     draw(75, hp, 'palevioletred');
+//     draw(100, mp, 'limegreen');
+//     draw(125, sp, 'steelblue');
+// };
+
+// clock()
+
+			
+
+		</script>
+
+	</div>
+
+</body>
+</html>
