@@ -1,0 +1,134 @@
+<!doctype>
+<html>
+<head></head>
+<body>
+	<style>
+		body {background:pink}
+		#wrap {width:620px;margin:0 auto;}
+		section {background:rgba(250,250,250,.2);border:1px solid #fff;margin:60px 0 0;position:relative;height:480px;}
+		section .tit {color:#fff;font-size:14px;font-weight:bold;position:absolute;left:20px;top:20px;}
+		section .guide {border-radius:50%;border:10px solid rgba(250,250,250,.6);box-sizing:border-box;overflow:hidden;position:absolute;}
+		section ul {color:#fff;font-size:12px;overflow:hidden;position:absolute;right:20px;bottom:20px;}
+		section li {float:left;list-style:none;margin:0 0 0 20px;}
+		section li span {font-weight:bold;}
+
+		.guide, #canvas {position:absolute;left:50%;top:50%;margin:-120px 0 0 -120px;width:240px;height:240px;}
+	}
+
+	</style>
+	<div id="wrap">
+		<div class="target"></div>
+
+		<section>
+			<div class="tit"></div>
+			<div class="artboard">
+				<div class="guide"></div>
+				<canvas id="canvas" width="240" height="240"></canvas>
+			</div>
+			<ul>
+				<li>x : <span>0</span></li>
+				<li>y : <span>0</span></li>
+			</ul>
+		</section>
+		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script>
+			$(function(){
+				init();
+			});
+
+			var mouseChk = false;
+			var circleSection;
+
+			var startX;
+			var oldX;
+			var guideW;
+
+			function init(){
+				circleSection = 0;
+				guideW = $('.guide').width();
+				
+				ctx.strokeStyle = '#00abcd';
+			    ctx.lineWidth = 10;	
+			    lineW = ctx.lineWidth;
+			}
+
+			var cvs = document.getElementById('canvas');
+			var ctx = cvs.getContext('2d');
+
+			var lineW;
+			var angle = [1.5, 0, 0.5, 1];
+
+			$('section').mousedown(function(e){
+				mouseChk = true;
+				startX = e.offsetX;
+				mousePosChk(e.offsetX, e.offsetY);
+			});
+			$('section').mousemove(function(e){
+				if(!mouseChk) return;
+				mousePosChk(e.offsetX, e.offsetY);
+							
+				var r = guideW/2;
+				var diff = circleSection==0||circleSection==3 ? e.offsetX-startX : startX-e.offsetX
+
+				if(diff <= 0) diff = '';
+				if(diff >= r) diff = r;
+
+				var p = parseInt(diff/r*100);
+				if(diff!='' && diff!=r && p!=0) cvsDraw(r, p);
+
+				if(circleSection==0 && guideW/2<=diff){
+					circleSection=1;
+					cvsDraw(r, angle[circleSection+1]*Math.PI);
+					startX = e.offsetX;
+				}else if(circleSection==1 || circleSection==2 || circleSection==3){
+					if(diff == '' || diff == r) startX = e.offsetX;
+					if(guideW/2<=diff) {
+						if(circleSection == 3){
+							circleSection = '';	
+							cvsDraw(r, angle[0]*Math.PI);
+							console.log('complete')
+						}else {
+							circleSection++;
+							
+							var start = angle[circleSection]*Math.PI;
+							var	end = circleSection!=3 ? angle[circleSection+1]*Math.PI : angle[0]*Math.PI;
+
+							ctx.arc(r+lineW, r+lineW, r+lineW/2, start, end, false);
+							startX = e.offsetX;
+						}
+					}
+				}
+			});
+			$('section').mouseup(function(e){
+				mousePosChk(e.offsetX, e.offsetY);
+				mouseChk = false;
+			});
+
+			function mousePosChk(x, y){
+				$('section ul li').eq(0).find('span').html(x);
+				$('section ul li').eq(1).find('span').html(y);
+			}
+
+			function cvsDraw($radius, $percent){
+				var start, end, draw;
+				if(circleSection == 0){
+					start = angle[0]*Math.PI;
+					draw = $percent*((2*Math.PI)/400)+start; //(2*Math.PI)/100 한바퀴!
+				}else {
+					start = angle[circleSection]*Math.PI;
+					end = circleSection!=3 ? angle[circleSection+1]*Math.PI : angle[0]*Math.PI;
+					draw = $percent*(end-start)/100+start
+				}
+				console.log(circleSection + ' : start:' + start + '/end:' + end + ' / draw : ' + $percent*end/100)
+
+		        ctx.beginPath();
+		        ctx.arc($radius+lineW, $radius+lineW, $radius+lineW/2, start, draw, false); // .arc(x,y,r,sAngle,eAngle,counterclockwise);
+
+		        ctx.stroke();
+			}
+		</script>
+
+	</div>
+
+</body>
+</html>
