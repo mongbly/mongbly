@@ -5,24 +5,29 @@
 </head>
 <body>
 	<style>
+		* {border:0;padding:0;margin:0;}
+		ul, li {list-style:none;}
+		a {text-decoration:none;}
+
 		#slider {box-sizing:border-box;padding:0 20px;margin:40px auto 0;position:relative;width:960px;}
-		#slider .thumb {overflow:hidden}
-		#slider .thumb ul {overflow:hidden;margin-left:-20px;}
-		#slider .thumb ul li {color:#fff;float:left;margin:0 0 0 20px;}
+		#slider .thumb {overflow:hidden;margin:0 70px;}
+		#slider .thumb ul {overflow:hidden;}
+		#slider .thumb ul li {color:#fff;float:left;margin:0 20px 0 0;}
+		#slider .thumb ul li:last-child {margin-right:0;}
 		#slider .thumb ul li a {background:#eee;display:block;color:#999;font-size:12px;text-align:center;line-height:180px;width:180px;height:180px;}
 
 		#slider .control {}
 		#slider .control .btns {}
-		#slider .control .btns a {background:rgba(250,250,0,.5);display:block;position:absolute;top:50%;margin-top:-30px;width:20px;height:60px;transtion:all 600ms}
+		#slider .control .btns a {background:rgba(250,250,0,.5);display:block;text-indent:2000px;overflow:hidden;white-space:nowrap;position:absolute;top:50%;margin-top:-30px;width:20px;height:60px;transtion:all 600ms}
 		#slider .control .btns a.btn_prev {left:20px;}
 		#slider .control .btns a.btn_next {right:20px;}
 		#slider .control .btns a.disabled {background:rgba(0,0,0,.5);opacity:.2}
 
-		#slider .control .carousel {text-align:center;position:absolute;bottom:-40px;}
+		#slider .control .carousel {text-align:center;position:absolute;left:0;bottom:-40px;width:100%;}
 		#slider .control .carousel ul {display:inline-block;overflow:hidden;}
 		#slider .control .carousel ul li {float:left;margin-left:10px;}
 		#slider .control .carousel ul li a {background:rgba(0,0,0,.5);display:block;float:left;opacity:.8;width:14px;height:4px;transiton:all 600ms}
-		#slider .control .carousel ul li a.active {background:rgba(250,250,0,.5);opacity:1}
+		#slider .control .carousel ul li.active a {background:rgba(250,250,0,.5);opacity:1}
 	</style>
 	<div id="slider">
 		<div class="thumb">
@@ -39,12 +44,12 @@
 		</div>
 		<div class="control">
 			<div class="btns">
-				<a href="#" class="btn_prev">prev</a>
+				<a href="#" class="btn_prev disabled">prev</a>
 				<a href="#" class="btn_next">next</a>
 			</div>
 			<div class="carousel">
 				<ul>
-					<li><a href="#"></a></li>
+					<li class="active"><a href="#"></a></li>
 					<li><a href="#"></a></li>
 					<li><a href="#"></a></li>
 					<li><a href="#"></a></li>
@@ -60,8 +65,68 @@
 	<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script>
 		$(function(){
+			sliderInit();
 
+			slider.find('.control .btn_prev').click(function(){
+				if(sliderMotionChk) return; // 슬라이더 모션이 진행중이면 해당 클릭 이벤트를 실행하지 않음.
+				prevSlider();
+				return false;
+			});
+			slider.find('.control .btn_next').click(function(){
+				if(sliderMotionChk) return;
+				nextSlider();
+				return false;
+			});
+			slider.find('.control .carousel a').click(function(){
+				if(sliderMotionChk) return;
+				currIdx = $(this).parent().index();
+				if(currIdx>=sliderL-1-viewNum) currIdx=sliderL-1-viewNum;
+				sliderMotion();
+				return false;
+			});
 		});
+		
+		var slider,
+			sliderItem;
+
+		var sliderW, sliderM, sliderL;
+
+		function sliderInit(){
+			slider = $('#slider');
+			sliderItem = slider.find('.thumb ul li');
+
+			sliderW = sliderItem.width();
+			sliderM = sliderItem.css('marginRight').replace('px','');
+			sliderL = sliderItem.length;
+
+			slider.find('.thumb ul').css('width', sliderW*sliderL + sliderM*(sliderL-1));
+		}
+
+
+		var currIdx = 0;
+		var viewNum = 4
+		var sliderMotionChk=false; // 슬라이더 모션이 진행중인지 체크. (슬라이더 모션이 진행중일 때에는 중복 클릭을 방지.)
+		function prevSlider(){
+			if(currIdx==0) currIdx=0;
+			else currIdx--;
+			sliderMotion();
+		}
+		function nextSlider(){
+			if(currIdx==sliderL-1-viewNum) currIdx=sliderL-1-viewNum;
+			else currIdx++;
+			sliderMotion();
+		}
+		function sliderMotion(){
+			console.log('currIdx : ' + currIdx);
+			slider.find('.thumb ul').animate({'marginLeft':-(sliderW*currIdx + sliderM*currIdx)}, 400, function(){
+				sliderMotionChk=false;
+			});
+
+			
+			function btnSty(){
+
+			}
+		}
 	</script>
 </body>
 </html>
