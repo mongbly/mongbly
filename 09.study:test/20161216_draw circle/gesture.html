@@ -60,15 +60,15 @@
 
 			$('section').mousedown(function(e){
 				mouseChk = true;
-				startX = e.offsetX;
-				mousePosChk(e.offsetX, e.offsetY);
+				startX = e.pageX;
+				mousePosChk(e.pageX, e.offsetY);
 			});
 			$('section').mousemove(function(e){
 				if(!mouseChk) return;
-				mousePosChk(e.offsetX, e.offsetY);
+				mousePosChk(e.pageX, e.offsetY);
 							
 				var r = guideW/2;
-				var diff = circleSection==0||circleSection==3 ? e.offsetX-startX : startX-e.offsetX
+				var diff = circleSection==0||circleSection==3 ? e.pageX-startX : startX-e.pageX
 
 				if(diff <= 0) diff = '';
 				if(diff >= r) diff = r;
@@ -79,9 +79,9 @@
 				if(circleSection==0 && guideW/2<=diff){
 					circleSection=1;
 					cvsDraw(r, angle[circleSection+1]*Math.PI);
-					startX = e.offsetX;
+					startX = e.pageX;
 				}else if(circleSection==1 || circleSection==2 || circleSection==3){
-					if(diff == '' || diff == r) startX = e.offsetX;
+					if(diff == '' || diff == r) startX = e.pageX;
 					if(guideW/2<=diff) {
 						if(circleSection == 3){
 							circleSection = '';	
@@ -94,13 +94,13 @@
 							var	end = circleSection!=3 ? angle[circleSection+1]*Math.PI : angle[0]*Math.PI;
 
 							ctx.arc(r+lineW, r+lineW, r+lineW/2, start, end, false);
-							startX = e.offsetX;
+							startX = e.pageX;
 						}
 					}
 				}
 			});
 			$('section').mouseup(function(e){
-				mousePosChk(e.offsetX, e.offsetY);
+				mousePosChk(e.pageX, e.offsetY);
 				mouseChk = false;
 			});
 
