@@ -10,13 +10,129 @@
     <meta name="title" content="">
     <title>BENCHMARKING</title>
     <link rel="shortcut icon" type="image/x-icon" href="">
- 
-    <link href="./css/reset.css" rel="stylesheet" type="text/css">
-    <link href="./css/fonts.css" rel="stylesheet" type="text/css">
-    <link href="./css/style.css" rel="stylesheet" type="text/css">
-    <link href="./css/media_query.css" rel="stylesheet" type="text/css">
+
+    <link href="./_idxSty/css/reset.css" rel="stylesheet" type="text/css">
+    <link href="./_idxSty/css/fonts.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="./_idxSty/js/jquery-1.9.1.js"></script>
+
+    <style>
+        body {background:#eee;font-family:'NanumBarunGothic';font-size:13px;line-height:22px;}
+        
+        #category {background:rgba(0,0,0,.1);text-align:center;padding:18px 0 10px;position:fixed;left:0;top:40px;width:100%;}
+        #category, #category * {transition:all 800ms;}
+        #category ul {display:inline-block;overflow:hidden;}
+        #category ul li {float:left;margin:0 0 0 10px;}
+        #category ul li:first-child {margin:0;}
+        #category ul li a {color:#999;display:block;padding:6px 6px 4px;}
+        #category ul li a:hover {background:#eee;color:#666;}
+        #category ul li.active a {background:#6c8ac8;color:#fff;}
+
+        #category.cover {background:rgba(0,0,0,.8);left:0;top:0;width:100%;height:100%;z-index:999;}
+        #category.cover ul {margin:30% 0 0;}
+        #category.cover ul li {float:none;margin:20px 0 0;}
+
+
+        .list {margin:160px 0 0;position:relative;}
+        .list ul {background:#fff;box-shadow:0 8px 10px rgba(0,0,0,.1);box-sizing:border-box;padding:40px 20px 60px;position:absolute;left:50%;margin:0 0 0 840px;width:800px;}
+        .list ul li {margin:0 0 20px;}
+        .list ul li a {display:block;overflow:hidden;}
+        .list ul li a .category {color:#999;font-size:11px;float:left;}
+        .list ul li a .name {color:#6c8ac8;float:left;font-size:16px;font-weight:bold;margin:0 0 0 6px;}
+        .list ul li .description {color:#666;clear:both;float:none;line-height:18px;}
+    </style>
+    <script>
+        $(function(){
+            loadData();
+
+            listSliderInit();
+            $('#category a').click(function(){
+                currIdx = $(this).parent().index();
+                $('#category').removeClass('cover');
+                $('#category li').removeClass('active');
+                $('#category li').eq(currIdx).addClass('active');
+
+                sliderMotion();
+            });
+        }); 
+        
+        var dom;
+        var name, url, dec;
+        function loadData(){
+            $('.list li').each(function(){
+                name = $(this).attr('data-name');
+                url = $(this).attr('data-url');
+                dec = $(this).attr('data-dec');
+                makeList(name, url, dec);
+
+                $(this).html(dom);
+            });
+        }
+        function makeList($name, $url, $dec){
+            var $category = $('#category li.active a').html();
+
+            dom= '<a href="'+$url+'" target="_blank">';
+            dom+=   '<span class="category">['+$category+']</span>';
+            dom+=   '<div class="name">'+$name+'</div>';
+            dom+=   '<p class="description">'+$dec+'</p>';
+            dom+='</a>';
+
+            return dom;
+        }           
+        
+        var sliderItem, sliderW;
+
+        var currIdx = 0, prevIdx, nextIdx;
+        var time = 0;
+
+        function listSliderInit(){
+            sliderItem = $('.list ul');
+            sliderW = parseInt(sliderItem.outerWidth());
+            sliderMotion();
+            time=800;
+        } 
+
+        function sliderMotion(){
+            sliderItem.eq(prevIdx).animate({'margin-left':-(sliderW*1.5+20)*2}, time);
+            sliderItem.eq(nextIdx).animate({'margin-left':(sliderW/2+20)*2}, time);
+
+            prevIdx = currIdx==0 ? sliderItem.length-1 : currIdx-1;
+            nextIdx = currIdx==sliderItem.length-1 ? 0 : currIdx+1;
+
+            console.log(prevIdx)
+
+            sliderItem.eq(prevIdx).css({'margin-left':-sliderW/2}).animate({'margin-left':-(sliderW*1.5+20)}, time);
+            sliderItem.eq(currIdx).animate({'margin-left':-sliderW/2}, time);
+            sliderItem.eq(nextIdx).css({'margin-left':(sliderW/2+20)*2}).animate({'margin-left':sliderW/2+20}, time);
+        }
+    </script>
 </head>
 
 <body>
+    <div id="wrap">
+        <div id="category" class="cover">
+            <ul>
+                <li class="active"><a href="#">HTML/HTML5</a></li>
+                <li><a href="#">CSS/CSS3</a></li>
+                <li><a href="#">JS/jQuery</a></li>
+                <li><a href="#">JAVA/JSP</a></li>
+                <li><a href="#">읽을거리</a></li>
+                <li><a href="#">디자인벤치마킹</a></li>
+            </ul>
+        </div>
+        <div class="list">
+            <ul class="active">
+                <li data-url="http://www.naver.com"
+                    data-name="가나다라마바사"
+                    data-dec="바사사사사사사사가나다라마바사사사사사사사가나다라마바사사사사사사사가나다라마바사사사사사사사가나다라마바사사사사사사사"
+                    >
+                </li>
+            </ul>
+            <ul>2</ul>
+            <ul>3</ul>
+            <ul>4</ul>
+            <ul>5</ul>
+            <ul>6</ul>
+        </div>
+    </div>
 </body>
 </html>
