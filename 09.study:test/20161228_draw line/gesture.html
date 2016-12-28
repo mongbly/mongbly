@@ -1,0 +1,73 @@
+<!doctype>
+<html>
+<head></head>
+<body>
+	<style>
+		body {background:pink}
+		#wrap {width:620px;margin:0 auto;}
+		section {background:rgba(250,250,250,.2);border:1px solid #fff;margin:60px 0 0;position:relative;height:480px;}
+		section .tit {color:#fff;font-size:14px;font-weight:bold;position:absolute;left:20px;top:20px;}
+		section .guide {border:10px solid rgba(250,250,250,.6);box-sizing:border-box;overflow:hidden;position:absolute;}
+		section ul {color:#fff;font-size:12px;overflow:hidden;position:absolute;right:20px;bottom:20px;}
+		section li {float:left;list-style:none;margin:0 0 0 20px;}
+		section li span {font-weight:bold;}
+
+		.guide, #canvas {border-radius:10px;overflow:hidden;position:absolute;left:50%;top:50%;margin:-10px 0 0 -200px;width:400px;height:20px;}
+	}
+
+	</style>
+	<div id="wrap">
+		<div class="target"></div>
+
+		<section>
+			<div class="tit"></div>
+			<div class="artboard">
+				<div class="guide"></div>
+				<canvas id="canvas" width="400" height="20"></canvas>
+			</div>
+			<ul>
+				<li>x : <span>0</span></li>
+				<li>y : <span>0</span></li>
+			</ul>
+		</section>
+		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script>
+			var mouseChk = false;
+
+			var startX;
+			var cvs = document.getElementById('canvas');
+			var ctx = cvs.getContext('2d');
+
+			$('section').mousedown(function(e){
+				mouseChk = true;
+				startX = e.pageX;
+
+				ctx.beginPath();
+				ctx.strokeStyle = '#00abcd';
+			    ctx.lineWidth = 20;	
+				ctx.moveTo(0, 10);
+				mousePosChk(startX, e.offsetY);
+			});
+			$('section').mousemove(function(e){
+				if(!mouseChk) return;
+				
+				var diff = e.pageX-startX;
+				ctx.lineTo(diff, 10);
+				ctx.stroke();
+				mousePosChk(e.pageX, e.offsetY);
+			});
+			$('section').mouseup(function(e){
+				mousePosChk(e.pageX, e.offsetY);
+				mouseChk = false;
+			});
+
+			function mousePosChk(x, y){
+				$('section ul li').eq(0).find('span').html(x);
+				$('section ul li').eq(1).find('span').html(y);
+			}
+		</script>
+
+	</div>
+
+</body>
+</html>
