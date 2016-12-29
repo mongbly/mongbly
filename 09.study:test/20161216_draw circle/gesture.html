@@ -84,9 +84,9 @@
 					if(diff == '' || diff == r) startX = e.pageX;
 					if(guideW/2<=diff) {
 						if(circleSection == 3){
-							circleSection = '';	
+							circleSection = 'complete';	
 							cvsDraw(r, angle[0]*Math.PI);
-							console.log('complete')
+							alert('complete')
 						}else {
 							circleSection++;
 							
@@ -100,8 +100,12 @@
 				}
 			});
 			$('section').mouseup(function(e){
+				// if(circleSection != 'complete') alert('fail');
 				mousePosChk(e.pageX, e.offsetY);
+				ctx.clearRect(0, 0, cvs.width, cvs.height);
 				mouseChk = false;
+				circleSection = 0;
+
 			});
 
 			function mousePosChk(x, y){
@@ -119,7 +123,7 @@
 					end = circleSection!=3 ? angle[circleSection+1]*Math.PI : angle[0]*Math.PI;
 					draw = $percent*(end-start)/100+start
 				}
-				console.log(circleSection + ' : start:' + start + '/end:' + end + ' / draw : ' + $percent*end/100)
+				// console.log(circleSection + ' : start:' + start + '/end:' + end + ' / draw : ' + $percent*end/100)
 
 		        ctx.beginPath();
 		        ctx.arc($radius+lineW, $radius+lineW, $radius+lineW/2, start, draw, false); // .arc(x,y,r,sAngle,eAngle,counterclockwise);
