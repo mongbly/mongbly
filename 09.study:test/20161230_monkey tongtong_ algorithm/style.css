@@ -1,0 +1,24 @@
+body {background:#efefed;}
+#wrap {margin:0 auto;width:400px;}
+#wrap ul {}
+#wrap ul li {overflow:hidden;margin:0 0 40px;}
+
+#wrap ul li > div {width:100px;height:30px;}
+#wrap ul li .road_left {background:pink;float:left;}
+#wrap ul li .road_right {background:violet;float:right;}
+
+#wrap ul li.type_0 {}
+#wrap ul li.type_0 .road_left {}
+#wrap ul li.type_0 .road_right {display:none;}
+#wrap ul li.type_1 {}
+#wrap ul li.type_1 .road_left {display:none;}
+#wrap ul li.type_1 .road_right {}
+#wrap ul li.type_2 {}
+#wrap ul li .road_left {}
+#wrap ul li .road_right {}
+
+/*
+	0:[1 0]
+	1:[0 1]
+	2:[1 1]
+*/
