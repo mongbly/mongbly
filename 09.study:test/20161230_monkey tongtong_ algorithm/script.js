@@ -5,7 +5,6 @@ $(function(){
 $(window).keydown(function(e){
 	// if(e.keyCode != 37 || e.keyCode != 39) return;
 
-	currIdx++;
 	if(e.keyCode == 37) pressKey = 'left';
 	if(e.keyCode == 39) pressKey = 'right';
 	
@@ -41,4 +40,18 @@ function appendRoad(){
 }
 function chk($key, $idx){
 	console.log('$key : ' + $key + ' | $idx : ' + $idx);
+
+	if(road[$idx] == 0) {
+		if($key=='left') $('ul li').eq($idx).find('.road_left').css('opacity', 0);
+		else alert('틀림')
+	}else if(road[$idx] == 1) {
+		if($key=='right') $('ul li').eq($idx).find('.road_right').css('opacity', 0);
+		else alert('틀림')
+	}else if(road[$idx] == 2) {
+		if($key=='left') $('ul li').eq($idx).find('.road_left').css('opacity', 0);
+		else if($key=='right') $('ul li').eq($idx).find('.road_right').css('opacity', 0);
+		else alert('틀림')
+	}
+
+	currIdx++;
 };
