@@ -157,8 +157,32 @@
 		// 4. drag(pc), touch swipe(mobile) 가능.
 
 		$(function(){
-			
+			sliderInit();
+			view.find('.control a').click(function(){
+				var a = $(this).attr('class');
+				slideMove(a);
+				return false;
+			});
 		});
+
+		var currIdx = 0;
+		var view, viewL;
+
+		function sliderInit(){
+			view=$('.view');
+			viewL = view.find('.content .box').length;
+		}
+		function slideMove($control){
+			if($control=='bt_prev'){
+				if(currIdx==0) currIdx = viewL-1;
+				else currIdx--;
+			}else if($control=='bt_next'){
+				if(currIdx==viewL-1) currIdx = 0;
+				else currIdx++;
+			}
+
+			console.log($control, currIdx);
+		}
 	</script>
 </body>
 </html>
